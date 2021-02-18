@@ -1,3 +1,5 @@
+Based on https://gitlab.com/Killbzz/vagrant.git (school group work)
+
 # Vagrant
 
 ## Architechture 
@@ -26,7 +28,7 @@ Voici les différents service du docker-compose:
 Pour exécuter le projet il faut utiliser les commandes suivantes : 
 
 ```
-git clone https://gitlab.com/Killbzz/vagrant.git
+git clone https://github.com/bdelafaire/CloudLike-Infrastructure.git
 ansible-playbook vagrant/playbook/install/install.yml #Commande afin d'initialiser l'installation des packages Vagrant et Virtualbox 6.0
 ansible-playbook vagrant/playbook/deploy_server/deploy_server.yml #Commande permettant de créer les Vm Backend, Frontend et bdd a partir de Vagrant
 
