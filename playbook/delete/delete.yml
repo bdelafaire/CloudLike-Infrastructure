@@ -1,0 +1,18 @@
+---
+
+- name: "Suppression Vagrant"
+  hosts: localhost
+  tasks:
+  - name: "Initialisation suppression Vagrant"
+    shell: "apt purge -y vagrant"
+    register: delete1
+  - debug:
+      msg:
+    with_items: "{{ delete1.stdout }}1"
+
+  - name: "Initialisation supression Virtualbox"
+    shell: "apt purge -y virtualbox-6.0"
+    register: delete2
+  - debug:
+      msg:
+    with_items: "{{ delete2.stdout }}"

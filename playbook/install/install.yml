@@ -1,0 +1,46 @@
+---
+
+- name: "Install vagrant"
+  hosts: localhost
+  ignore_errors: yes
+  tasks:
+  - name: "Initialisation installation vagrant"
+    apt:
+      name: vagrant
+      state: present
+    register: vagrant
+  - debug:
+      msg:
+    with_items: "{{ vagrant.stdout }}"
+
+  - name: "Verification installation Vagrant"
+    shell: "vagrant --version"
+    register: verif1
+  - debug:
+      msg: "Vagrant installe"
+    when: verif1 is succeeded
+    with_items: "{{ verif1.stdout }}"
+
+  - name: "Installation plugin vagrant Docker"
+    shell: "vagrant plugin install  vagrant-reload"
+    register: plugin
+  - debug:
+      msg:
+    with_items: "{{ plugin.stdout }}"
+
+  - name: "installation virtualbox 6.0" 
+    apt:
+      name: virtualbox-6.0
+      state: present
+    register: virtualbox
+  - debug:
+      msg:
+    with_items: "{{ virtualbox.stdout }}"
+
+  - name: "Verification installation Virtualbox 6.0"
+    shell: "vboxmanage --version"
+    register: verif2
+  - debug:
+      msg: "Virtualbox installe"
+    when: verif2 is succeeded
+    with_items: "{{ verif2.stdout }}"

@@ -1,0 +1,42 @@
+---
+
+- name: "Deploy servers"
+  hosts: localhost
+  tasks:
+  - name: "Deploy Backend"
+    shell: "vagrant up"
+    args:
+      chdir: "/root/vagrant/vagrant_file/back"
+    register: back
+  - debug:
+      msg: "Installation du backend termine"
+    when: back is succeeded
+    with_items: "{{ back.stdout }}"
+
+  - name: "Deploy Frontend"
+    shell: "vagrant up"
+    args:
+      chdir: "/root/vagrant/vagrant_file/front"
+    register: front
+  - debug:
+      msg: "Installation du frontend termine"
+    when: front is succeeded
+    with_items: "{{ front.stdout }}"
+
+  - name: "Deploy Bdd"
+    shell: "vagrant up"
+    args:
+      chdir: "/root/vagrant/vagrant_file/bdd"
+    register: bdd_up
+  - debug:
+      msg:
+    with_items: "{{ bdd_up.stdout }}"
+
+  - name: " Provision bdd"
+    shell: "vagrant provision"
+    args:
+      chdir: "/root/vagrant/vagrant_file/bdd"
+    register: bdd_provision
+  - debug:
+      msg:
+    with_items: "{{ bdd_provision }}"

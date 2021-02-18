@@ -1,0 +1,45 @@
+#
+# set env vars befor running vagrant
+# https://docs.gitlab.com/runner/
+
+# reuired plugin, install it with
+# vagrant plugin install vagrant-reload
+Vagrant.has_plugin?('vagrant-reload')
+
+
+V_CPU = 2 # in cores
+V_MEM = 1024 # in megabytes per core
+V_MEM_TOTAL = V_MEM * V_CPU
+SYNC_TYPE = "rsync" # how to sync files in vagrant, for lxc rsync is suggested
+
+Vagrant.configure(2) do |config|
+  # because sometimes vagrant key insertion in boxes is broken, we skip step of updating insecure keys
+  config.ssh.insert_key = false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider :virtualbox do |vbox, override|
+    override.vm.box = "generic/ubuntu1804"
+  end
+
+
+  # reboot vm, required before docker install, for new kernel
+  config.vm.provision :reload
+
+  config.vm.provision 'docker',
+    type: 'shell',
+    path: '../docker.sh'
+
+  config.vm.define "backend" do |backend|
+    backend.vm.network "public_network", :bridge => "ens33", ip: "192.168.8.237"
+    backend.vm.provision :shell, :path => "secrets.sh"
+    backend.vm.provision "file", source: "../../docker-compose.yml", destination: "/home/vagrant/docker-compose.yml"
+
+    backend.vm.provision "shell", inline: "echo BDD_IP=$BDD_IP >> /home/vagrant/.env"
+    backend.vm.provision "shell", inline: "echo BACK_IP=$BACK_IP >> /home/vagrant/.env"
+    backend.vm.provision "shell", inline: "echo FRONT_IP=$FRONT_IP >> /home/vagrant/.env"
+    backend.vm.provision "shell", inline: "echo SUBNET=$SUBNET >> /home/vagrant/.env"
+
+    backend.vm.provision "shell", inline: "cd /home/vagrant; docker-compose up -d"
+  end
+end
+
